@@ -8,6 +8,9 @@ import idl from "src/idl.json";
 import { findProgramAddressSync } from "@project-serum/anchor/dist/cjs/utils/pubkey";
 import { utf8 } from "@project-serum/anchor/dist/cjs/utils/bytes";
 
+import * as buffer from "buffer";
+window.Buffer = buffer.Buffer;
+
 const BlogContext = createContext();
 
 const PROGRAM_KEY = new PublicKey(idl.metadata.address)
@@ -50,6 +53,7 @@ export const BlogProvider = ({ children }) => {
         try {
           const [userPda] = await findProgramAddressSync([utf8.encode('user'), publicKey.toBuffer()], program.programId)
           const user = await program.account.userAccount.fetch(userPda)
+
           if (user) {
             setInitialize(true)
             user.avatar = "https://img.freepik.com/free-photo/puppy-that-is-walking-snow_1340-37228.jpg"
@@ -58,7 +62,6 @@ export const BlogProvider = ({ children }) => {
 
             const postAccount = await program.account.textAccount.all()
             setPosts(postAccount);
-            console.log(postAccount)
           }
         } catch (error) {
           console.log("No user")
@@ -84,8 +87,8 @@ export const BlogProvider = ({ children }) => {
           .initUser(name)
           .accounts({
             userAccount: userPda,
-            authority: publicKey,
-            systemProgram: SystemProgram.programId
+            // authority: publicKey,
+            // systemProgram: SystemProgram.programId
           })
           .rpc()
         
